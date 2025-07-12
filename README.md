@@ -1,23 +1,35 @@
 # 🧠 RAG PDF Assistant
 
-A private AI assistant that lets you upload PDF files and ask questions about them using Retrieval-Augmented Generation (RAG) and local LLMs via Ollama.
+A local AI assistant that lets you upload **PDF files** and ask **questions** about them using **RAG (Retrieval-Augmented Generation)**. It runs **fully offline** using a local LLM like Mistral via [Ollama](https://ollama.com), and uses `FAISS` + `sentence-transformers` for semantic search.
 
-## 🔧 Tech Stack
-- FastAPI (backend)
-- PyMuPDF (PDF parsing)
-- SentenceTransformers (embeddings)
-- FAISS (vector search)
-- Ollama + Mistral (local LLM)
-- (Optional) Streamlit or React (UI)
+> Built with FastAPI, PyMuPDF, FAISS, and Mistral LLM.
 
-## 🚀 How to Run Locally
+---
 
-```bash
-# Install dependencies
-pip install -r requirements.txt
+## 📦 Features
 
-# Start FastAPI server
-uvicorn backend.main:app --reload
+- 🔍 Extracts text from PDF files
+- 🧠 Splits and embeds document chunks
+- 🔎 Retrieves relevant content using vector search (FAISS)
+- 🤖 Answers questions using a local LLM (Mistral)
+- 💾 Works fully offline (no OpenAI API needed)
+- 🔧 Easy to extend with Streamlit, React, or Docker
 
-# In another terminal, run the LLM
-ollama run mistral
+---
+
+## 🚀 Tech Stack
+
+| Category | Tools Used |
+|----------|------------|
+| Backend  | **FastAPI**, Python |
+| AI / NLP | **Mistral (via Ollama)**, SentenceTransformers |
+| Embeddings | `all-MiniLM-L6-v2` |
+| Vector Search | **FAISS** |
+| File Parsing | **PyMuPDF** |
+| Deployment | Localhost, Docker (optional) |
+| UI (Optional) | Streamlit or React |
+
+---
+
+## 📁 Project Structure
+
