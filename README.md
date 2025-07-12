@@ -33,3 +33,31 @@ A local AI assistant that lets you upload **PDF files** and ask **questions** ab
 
 ## 📁 Project Structure
 
+rag-assistant/
+├── backend/ # FastAPI backend
+│ ├── main.py # API endpoints
+│ ├── rag.py # RAG logic (embedding + retrieval)
+│ └── utils.py # PDF parsing + chunking
+├── data/ # Uploaded files & FAISS index
+├── models/ # Optional LLM/config files
+├── requirements.txt # Python dependencies
+├── .gitignore # Ignore cache, env, FAISS index
+└── README.md # You're here!
+
+---
+
+## ⚙️ Requirements
+
+- Python 3.10+
+- [Ollama](https://ollama.com) (for local LLMs)
+- Git, pip
+
+---
+
+## 🧪 Setup Instructions
+
+### 1. Clone the Repo
+
+```bash
+git clone https://github.com/Rayyan-Oumlil/RagPdfAssitant.git
+cd RagPdfAssitant
