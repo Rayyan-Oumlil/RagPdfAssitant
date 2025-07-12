@@ -26,5 +26,6 @@ async def upload_file(file: UploadFile = File(...)):
 
 @app.post("/ask")
 async def ask(question: str = Form(...)):
-    answer = ask_question(question)
-    return {"answer": answer}
+    response = ask_question(question)
+    return response  # includes both answer and sources
+

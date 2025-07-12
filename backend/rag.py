@@ -25,17 +25,34 @@ def add_document(file_path: str):
     index.add(np.array(embeddings))
     faiss.write_index(index, INDEX_PATH)
 
-def ask_question(question: str, top_k: int = 5) -> str:
+def ask_question(question: str, top_k: int = 5, threshold: float = 0.5) -> dict:
     question_vec = EMBED_MODEL.encode([question])
     D, I = index.search(np.array(question_vec), top_k)
-    relevant_chunks = [DOC_CHUNKS[i] for i in I[0] if i < len(DOC_CHUNKS)]
-    context = "\n\n".join(relevant_chunks)
+
+    # Filter based on similarity score
+    sources = [DOC_CHUNKS[i] for score, i in zip(D[0], I[0]) if score < threshold]
+
+    for score, i in zip(D[0], I[0]):
+        print(f"{score:.3f} → {DOC_CHUNKS[i][:80]}...")
+
+
+    if not sources:
+        return {
+            "answer": "Sorry, I couldn't find relevant information in the document.",
+            "sources": []
+        }
+
+    context = "\n\n".join(sources)
     prompt = f"Answer the question using the context below:\n\nContext:\n{context}\n\nQuestion: {question}"
 
-    # Call local LLM (via Ollama CLI)
     result = subprocess.run(
         ['ollama', 'run', 'mistral'],
         input=prompt.encode(),
         stdout=subprocess.PIPE
     )
-    return result.stdout.decode()
+
+    return {
+        "answer": result.stdout.decode(),
+        "sources": sources
+    }
+
