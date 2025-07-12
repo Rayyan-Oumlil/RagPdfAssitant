@@ -19,15 +19,14 @@ A local AI assistant that lets you upload **PDF files** and ask **questions** ab
 
 ## 🚀 Tech Stack
 
-| Category | Tools Used |
-|----------|------------|
-| Backend  | **FastAPI**, Python |
-| AI / NLP | **Mistral (via Ollama)**, SentenceTransformers |
-| Embeddings | `all-MiniLM-L6-v2` |
-| Vector Search | **FAISS** |
-| File Parsing | **PyMuPDF** |
-| Deployment | Localhost, Docker (optional) |
-| UI (Optional) | Streamlit or React |
+| Category   | Tools Used                           |
+|------------|---------------------------------------|
+| Backend    | FastAPI, Python                      |
+| AI / NLP   | Mistral (via Ollama), SentenceTransformers |
+| Embeddings | all-MiniLM-L6-v2                     |
+| Vector DB  | FAISS                                |
+| File I/O   | PyMuPDF                              |
+| Optional   | Streamlit or React (for UI)          |
 
 ---
 
@@ -43,6 +42,10 @@ rag-assistant/
 ├── requirements.txt # Python dependencies
 ├── .gitignore # Ignore cache, env, FAISS index
 └── README.md # You're here!
+
+yaml
+Copier
+Modifier
 
 ---
 
@@ -61,3 +64,107 @@ rag-assistant/
 ```bash
 git clone https://github.com/Rayyan-Oumlil/RagPdfAssitant.git
 cd RagPdfAssitant
+2. Create a Virtual Environment (optional)
+bash
+Copier
+Modifier
+python -m venv venv
+venv\Scripts\activate  # Windows
+3. Install Dependencies
+bash
+Copier
+Modifier
+pip install -r requirements.txt
+4. Start Ollama + Download the Mistral Model
+bash
+Copier
+Modifier
+ollama run mistral
+The first time, it will download ~4.1GB. Keep this terminal open.
+
+5. Start the FastAPI Server
+Open another terminal and run:
+
+bash
+Copier
+Modifier
+uvicorn backend.main:app --reload
+Visit the docs at:
+📎 http://127.0.0.1:8000/docs
+
+📡 API Endpoints
+➕ POST /upload
+Upload and index a PDF file
+
+Form field: file: UploadFile
+
+❓ POST /ask
+Ask a question about the uploaded content
+
+Form field: question: str
+
+🧠 How It Works (RAG Flow)
+Upload a PDF
+
+Text is extracted and split into small chunks
+
+Chunks are embedded with sentence-transformers
+
+Embeddings stored in FAISS
+
+When a question is asked:
+
+It's embedded
+
+Top chunks are retrieved from FAISS
+
+Chunks + question are passed to the LLM (Mistral via Ollama)
+
+A natural language answer is generated
+
+🧱 Python Dependencies
+nginx
+Copier
+Modifier
+fastapi
+uvicorn
+pymupdf
+sentence-transformers
+faiss-cpu
+python-multipart
+🛡️ Limitations
+Not production-ready (no auth, rate-limiting, or sanitization)
+
+Currently only supports .pdf files
+
+Mistral output quality may vary; no fine-tuning applied
+
+✅ TODO / Improvements
+ Add Streamlit or React UI
+
+ Add citations and source highlighting
+
+ Support multiple documents / users
+
+ Dockerize the project
+
+ Add .txt file support
+
+👨‍💻 Author
+Built by Rayyan Oumlil
+
+📝 License
+MIT License. Free to use, modify, and share.
+
+yaml
+Copier
+Modifier
+
+---
+
+Once you add this file to your repo and commit:
+
+```bash
+git add README.md
+git commit -m "Add full README"
+git push origin main
