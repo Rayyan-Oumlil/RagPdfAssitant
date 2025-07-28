@@ -562,24 +562,28 @@ with col1:
         help="Select a PDF file to analyze"
     )
     
+    # Auto-upload when file is selected
     if uploaded_file is not None:
-        if st.button("📤 Upload Document", type="primary"):
-            with st.spinner("Upload and indexing in progress..."):
+        # Check if file was already uploaded
+        if uploaded_file.name not in st.session_state.uploaded_files:
+            with st.spinner("Uploading and indexing..."):
                 success, message = add_document_to_index(uploaded_file)
                 if success:
-                    st.success(message)
+                    st.success(f"✅ {uploaded_file.name} uploaded successfully!")
                     st.session_state.uploaded_files.append(uploaded_file.name)
                     st.rerun()
                 else:
-                    st.error(message)
+                    st.error(f"❌ Error: {message}")
+        else:
+            st.info(f"📋 {uploaded_file.name} already uploaded")
 
 with col2:
-    st.header("📋 Uploaded Documents")
+    st.subheader("📋 Documents")
     if st.session_state.uploaded_files:
         for file in st.session_state.uploaded_files:
             st.write(f"• {file}")
     else:
-        st.info("No documents uploaded")
+        st.info("No documents")
 
 # Chat area
 st.header("💬 Chat with Assistant")
