@@ -315,9 +315,9 @@ def initialize_rag():
         else:
             st.session_state.documents_info = []
         
-        # Sync uploaded_files with documents_info
-        if st.session_state.documents_info:
-            st.session_state.uploaded_files = [doc['name'] for doc in st.session_state.documents_info]
+        # Don't auto-load uploaded_files - start fresh each time
+        if 'uploaded_files' not in st.session_state:
+            st.session_state.uploaded_files = []
         
         st.session_state.rag_initialized = True
 
