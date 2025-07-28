@@ -625,68 +625,109 @@ if st.button("🤖 Ask Question", type="primary", disabled=not question.strip())
 if st.session_state.chat_history:
     st.header("📝 Conversation History")
     
-    # Export section
+    # Display individual conversations with improved design
+    for i, chat in enumerate(reversed(st.session_state.chat_history)):
+        # Create a card-like container for each conversation
+        with st.container():
+            st.markdown("---")
+            
+            # Header with question preview and delete button
+            col1, col2 = st.columns([6, 1])
+            
+            with col1:
+                # Question preview with better formatting
+                question_preview = chat['question'][:60] + "..." if len(chat['question']) > 60 else chat['question']
+                st.markdown(f"**Q{len(st.session_state.chat_history) - i}:** {question_preview}")
+                
+                # Model info with badge-like styling
+                model_name = chat['model'].replace("cloud:", "").title()
+                st.markdown(f"<span style='background-color: #e1f5fe; color: #0277bd; padding: 2px 8px; border-radius: 12px; font-size: 0.8em;'>{model_name}</span>", unsafe_allow_html=True)
+            
+            with col2:
+                # Delete button with better styling
+                if st.button("🗑️", key=f"delete_{i}", help="Delete this conversation", use_container_width=True):
+                    index_to_delete = len(st.session_state.chat_history) - 1 - i
+                    st.session_state.chat_history.pop(index_to_delete)
+                    st.rerun()
+            
+            # Expandable content with better formatting
+            with st.expander("📖 View full conversation", expanded=False):
+                # Question section
+                st.markdown("### 🤔 Question")
+                st.markdown(f"*{chat['question']}*")
+                
+                # Answer section with better formatting
+                st.markdown("### 🤖 Answer")
+                st.markdown(chat['answer'])
+                
+                # Metadata section
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.markdown(f"**Model:** {chat['model']}")
+                with col2:
+                    st.markdown(f"**Sources:** {len(chat.get('sources', []))}")
+                with col3:
+                    st.markdown(f"**Length:** {len(chat['answer'])} chars")
+    
+    # Export section at the bottom with improved design
+    st.markdown("---")
+    st.subheader("📤 Export Conversations")
+    
+    # Export options in a more elegant layout
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     
     with col1:
-        if st.button("📄 Export JSON", help="Export conversations as JSON"):
+        if st.button("📄 JSON", help="Export as structured JSON data", use_container_width=True):
             json_data = export_conversations_to_json(st.session_state.chat_history)
             filename = f"conversations_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             st.download_button(
-                label="Download JSON",
+                label="⬇️ Download JSON",
                 data=json_data,
                 file_name=filename,
-                mime="application/json"
+                mime="application/json",
+                use_container_width=True
             )
     
     with col2:
-        if st.button("📝 Export Text", help="Export conversations as text"):
+        if st.button("📝 Text", help="Export as readable text file", use_container_width=True):
             text_data = export_conversations_to_text(st.session_state.chat_history)
             filename = f"conversations_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
             st.download_button(
-                label="Download Text",
+                label="⬇️ Download Text",
                 data=text_data,
                 file_name=filename,
-                mime="text/plain"
+                mime="text/plain",
+                use_container_width=True
             )
     
     with col3:
-        if st.button("📊 Export CSV", help="Export conversations as CSV"):
+        if st.button("📊 CSV", help="Export as spreadsheet-compatible CSV", use_container_width=True):
             csv_data = export_conversations_to_csv(st.session_state.chat_history)
             filename = f"conversations_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
             st.download_button(
-                label="Download CSV",
+                label="⬇️ Download CSV",
                 data=csv_data,
                 file_name=filename,
-                mime="text/csv"
+                mime="text/csv",
+                use_container_width=True
             )
     
     with col4:
-        if st.button("🗑️ Clear All", help="Clear all conversations", type="secondary"):
+        if st.button("🗑️ Clear All", help="Clear all conversations", type="secondary", use_container_width=True):
             st.session_state.chat_history = []
             st.rerun()
     
+    # Summary stats
     st.markdown("---")
-    
-    # Display individual conversations
-    for i, chat in enumerate(reversed(st.session_state.chat_history)):
-        col1, col2 = st.columns([4, 1])
-        
-        with col1:
-            with st.expander(f"Question {len(st.session_state.chat_history) - i}: {chat['question'][:50]}..."):
-                st.write(f"**Question:** {chat['question']}")
-                st.write(f"**Model used:** {chat['model']}")
-                st.write(f"**Answer:** {chat['answer']}")
-                
-                # Sources removed for cleaner interface
-        
-        with col2:
-            # Delete button
-            if st.button("🗑️", key=f"delete_{i}", help="Delete this question"):
-                # Remove question from history
-                index_to_delete = len(st.session_state.chat_history) - 1 - i
-                st.session_state.chat_history.pop(index_to_delete)
-                st.rerun()
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Conversations", len(st.session_state.chat_history))
+    with col2:
+        total_chars = sum(len(chat['answer']) for chat in st.session_state.chat_history)
+        st.metric("Total Characters", f"{total_chars:,}")
+    with col3:
+        avg_length = total_chars // len(st.session_state.chat_history) if st.session_state.chat_history else 0
+        st.metric("Avg Answer Length", f"{avg_length:,} chars")
 
 # Footer
 st.markdown("---")
