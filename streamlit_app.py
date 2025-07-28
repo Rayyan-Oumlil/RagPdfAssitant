@@ -30,57 +30,195 @@ def apply_dark_mode():
     if st.session_state.dark_mode:
         st.markdown("""
         <style>
-        .stApp {
+        /* Main app background */
+        .main .block-container {
             background-color: #0e1117;
-            color: #fafafa;
+            color: #ffffff;
         }
-        .stSidebar {
-            background-color: #262730;
+        
+        /* Sidebar */
+        .css-1d391kg {
+            background-color: #1e1e1e;
         }
+        
+        /* All text elements */
+        .stMarkdown, .stText, .stWrite, .stSubheader, .stHeader {
+            color: #ffffff !important;
+        }
+        
+        /* Headers */
+        h1, h2, h3, h4, h5, h6 {
+            color: #ffffff !important;
+        }
+        
+        /* Buttons */
         .stButton > button {
-            background-color: #4CAF50;
-            color: white;
+            background-color: #4CAF50 !important;
+            color: white !important;
+            border: 1px solid #4CAF50 !important;
         }
+        
+        .stButton > button:hover {
+            background-color: #45a049 !important;
+        }
+        
+        /* Text inputs */
         .stTextInput > div > div > input {
-            background-color: #262730;
-            color: #fafafa;
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+            border: 1px solid #555555 !important;
         }
+        
+        /* Text areas */
         .stTextArea > div > div > textarea {
-            background-color: #262730;
-            color: #fafafa;
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+            border: 1px solid #555555 !important;
         }
+        
+        /* Select boxes */
         .stSelectbox > div > div > select {
-            background-color: #262730;
-            color: #fafafa;
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+            border: 1px solid #555555 !important;
         }
+        
+        /* File uploader */
         .stFileUploader > div > div {
-            background-color: #262730;
-            color: #fafafa;
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+            border: 1px solid #555555 !important;
         }
-        .stExpander > div > div {
-            background-color: #262730;
-            color: #fafafa;
+        
+        /* Expanders */
+        .streamlit-expanderHeader {
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+            border: 1px solid #555555 !important;
         }
+        
+        .streamlit-expanderContent {
+            background-color: #1e1e1e !important;
+            color: #ffffff !important;
+        }
+        
+        /* Metrics */
         .stMetric > div > div {
-            background-color: #262730;
-            color: #fafafa;
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
         }
-        .stAlert {
-            background-color: #262730;
-            color: #fafafa;
+        
+        /* Alerts and info boxes */
+        .stAlert, .stInfo, .stWarning, .stError, .stSuccess {
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+            border: 1px solid #555555 !important;
         }
+        
+        /* Toggle */
+        .stToggle > label {
+            color: #ffffff !important;
+        }
+        
+        /* Links */
+        a {
+            color: #4CAF50 !important;
+        }
+        
+        /* Code blocks */
+        .stCodeBlock {
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+        }
+        
+        /* Divider lines */
+        hr {
+            border-color: #555555 !important;
+        }
+        
+        /* Main container */
+        .main .block-container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        
+        /* Force all text to be visible */
+        * {
+            color: inherit;
+        }
+        
+        /* Specific override for any remaining invisible text */
+        .stMarkdown p, .stMarkdown div, .stMarkdown span {
+            color: #ffffff !important;
+        }
+        
         </style>
         """, unsafe_allow_html=True)
     else:
         st.markdown("""
         <style>
-        .stApp {
+        /* Light mode - reset to defaults */
+        .main .block-container {
             background-color: #ffffff;
             color: #31333f;
         }
-        .stSidebar {
+        
+        .css-1d391kg {
             background-color: #f0f2f6;
         }
+        
+        /* Reset all colors to default */
+        .stMarkdown, .stText, .stWrite, .stSubheader, .stHeader {
+            color: #31333f !important;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            color: #31333f !important;
+        }
+        
+        /* Reset form elements to default */
+        .stTextInput > div > div > input,
+        .stTextArea > div > div > textarea,
+        .stSelectbox > div > div > select,
+        .stFileUploader > div > div {
+            background-color: #ffffff !important;
+            color: #31333f !important;
+            border: 1px solid #d0d0d0 !important;
+        }
+        
+        /* Reset buttons */
+        .stButton > button {
+            background-color: #ff4b4b !important;
+            color: white !important;
+        }
+        
+        /* Reset expanders */
+        .streamlit-expanderHeader {
+            background-color: #ffffff !important;
+            color: #31333f !important;
+        }
+        
+        .streamlit-expanderContent {
+            background-color: #fafafa !important;
+            color: #31333f !important;
+        }
+        
+        /* Reset alerts */
+        .stAlert, .stInfo, .stWarning, .stError, .stSuccess {
+            background-color: #ffffff !important;
+            color: #31333f !important;
+        }
+        
+        /* Reset toggle */
+        .stToggle > label {
+            color: #31333f !important;
+        }
+        
+        /* Reset links */
+        a {
+            color: #ff4b4b !important;
+        }
+        
         </style>
         """, unsafe_allow_html=True)
 
