@@ -49,7 +49,25 @@ class LLMProvider:
     """Classe de base pour les fournisseurs de LLMs"""
     
     def __init__(self, api_key: str = None):
-        self.api_key = api_key or os.environ.get(f"{self.__class__.__name__.upper()}_API_KEY")
+        # Essayer d'abord les secrets Streamlit, puis les variables d'environnement
+        if api_key:
+            self.api_key = api_key
+        else:
+            # Essayer les secrets Streamlit
+            try:
+                if self.__class__.__name__ == "GoogleProvider":
+                    self.api_key = st.secrets.get("GOOGLE_API_KEY")
+                elif self.__class__.__name__ == "HuggingFaceProvider":
+                    self.api_key = st.secrets.get("HUGGINGFACE_API_KEY")
+                elif self.__class__.__name__ == "OpenAIProvider":
+                    self.api_key = st.secrets.get("OPENAI_API_KEY")
+                elif self.__class__.__name__ == "AnthropicProvider":
+                    self.api_key = st.secrets.get("ANTHROPIC_API_KEY")
+                else:
+                    self.api_key = None
+            except:
+                # Fallback sur les variables d'environnement
+                self.api_key = os.environ.get(f"{self.__class__.__name__.upper()}_API_KEY")
     
     def generate_response(self, prompt: str, **kwargs) -> str:
         """Génère une réponse (à implémenter dans les classes enfants)"""
@@ -247,6 +265,20 @@ def check_provider_credentials(provider_name: str) -> bool:
     if provider_name.lower() not in LLM_PROVIDERS:
         return False
     
+    # Essayer d'abord les secrets Streamlit
+    try:
+        if provider_name.lower() == "google" and st.secrets.get("GOOGLE_API_KEY"):
+            return True
+        elif provider_name.lower() == "huggingface" and st.secrets.get("HUGGINGFACE_API_KEY"):
+            return True
+        elif provider_name.lower() == "openai" and st.secrets.get("OPENAI_API_KEY"):
+            return True
+        elif provider_name.lower() == "anthropic" and st.secrets.get("ANTHROPIC_API_KEY"):
+            return True
+    except:
+        pass
+    
+    # Fallback sur les variables d'environnement
     env_var = f"{provider_name.upper()}_API_KEY"
     return bool(os.environ.get(env_var))
 
@@ -466,6 +498,15 @@ with st.sidebar:
     }
     
     for name, key in api_keys.items():
+        # Essayer d'abord les secrets Streamlit
+        try:
+            if st.secrets.get(key):
+                st.write(f"✅ {name}")
+                continue
+        except:
+            pass
+        
+        # Fallback sur les variables d'environnement
         if os.environ.get(key):
             st.write(f"✅ {name}")
         else:
