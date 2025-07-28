@@ -437,6 +437,7 @@ Give a short, direct answer. Do not add extra information not found in the conte
 def reset_index():
     """Réinitialise l'index"""
     st.session_state.doc_chunks = []
+    st.session_state.uploaded_files = []  # Vider la liste des documents uploadés
     st.session_state.index = faiss.IndexFlatL2(EMBEDDING_DIM)
     
     # Supprimer les fichiers
@@ -483,30 +484,6 @@ with st.sidebar:
     
     if not models:
         st.warning("Aucun LLM cloud configuré. Ajoutez vos clés API dans les secrets.")
-    
-    # Statut des clés API
-    st.subheader("🔑 Clés API")
-    api_keys = {
-        "Google": "GOOGLE_API_KEY",
-        "Hugging Face": "HUGGINGFACE_API_KEY",
-        "OpenAI": "OPENAI_API_KEY",
-        "Anthropic": "ANTHROPIC_API_KEY"
-    }
-    
-    for name, key in api_keys.items():
-        # Essayer d'abord les secrets Streamlit
-        try:
-            if st.secrets.get(key):
-                st.write(f"✅ {name}")
-                continue
-        except:
-            pass
-        
-        # Fallback sur les variables d'environnement
-        if os.environ.get(key):
-            st.write(f"✅ {name}")
-        else:
-            st.write(f"❌ {name}")
     
     # Actions
     st.subheader("🔄 Actions")
