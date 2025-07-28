@@ -571,12 +571,23 @@ if st.session_state.chat_history:
     st.header("📝 Historique des conversations")
     
     for i, chat in enumerate(reversed(st.session_state.chat_history)):
-        with st.expander(f"Question {len(st.session_state.chat_history) - i}: {chat['question'][:50]}..."):
-            st.write(f"**Question:** {chat['question']}")
-            st.write(f"**Modèle utilisé:** {chat['model']}")
-            st.write(f"**Réponse:** {chat['answer']}")
-            
-            # Sources supprimées pour une interface plus propre
+        col1, col2 = st.columns([4, 1])
+        
+        with col1:
+            with st.expander(f"Question {len(st.session_state.chat_history) - i}: {chat['question'][:50]}..."):
+                st.write(f"**Question:** {chat['question']}")
+                st.write(f"**Modèle utilisé:** {chat['model']}")
+                st.write(f"**Réponse:** {chat['answer']}")
+                
+                # Sources supprimées pour une interface plus propre
+        
+        with col2:
+            # Bouton de suppression
+            if st.button("🗑️", key=f"delete_{i}", help="Supprimer cette question"):
+                # Supprimer la question de l'historique
+                index_to_delete = len(st.session_state.chat_history) - 1 - i
+                st.session_state.chat_history.pop(index_to_delete)
+                st.rerun()
 
 # Footer
 st.markdown("---")
