@@ -635,24 +635,29 @@ col1, col2 = st.columns([2, 1])
 with col1:
     st.header("📄 Document Upload")
     
-    uploaded_file = st.file_uploader(
-        "Choose a PDF file",
+    uploaded_files = st.file_uploader(
+        "Choose PDF files",
         type=['pdf'],
-        help="Select a PDF file to analyze"
+        accept_multiple_files=True,
+        help="Select one or multiple PDF files to analyze"
     )
     
-    # Auto-upload when file is selected
-    if uploaded_file is not None:
-        # Check if file was already uploaded
-        if uploaded_file.name not in st.session_state.uploaded_files:
-            with st.spinner("Uploading and indexing..."):
-                success, message = add_document_to_index(uploaded_file)
-                if success:
-                    st.success(f"✅ {uploaded_file.name} uploaded successfully!")
-                    st.session_state.uploaded_files.append(uploaded_file.name)
-                    st.rerun()
-                else:
-                    st.error(f"❌ Error: {message}")
+    # Auto-upload when files are selected
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            # Check if file was already uploaded
+            if uploaded_file.name not in st.session_state.uploaded_files:
+                with st.spinner(f"Uploading {uploaded_file.name}..."):
+                    success, message = add_document_to_index(uploaded_file)
+                    if success:
+                        st.success(f"✅ {uploaded_file.name} uploaded successfully!")
+                        st.session_state.uploaded_files.append(uploaded_file.name)
+                    else:
+                        st.error(f"❌ Error with {uploaded_file.name}: {message}")
+        
+        # Rerun after processing all files
+        if any(uploaded_file.name not in st.session_state.uploaded_files for uploaded_file in uploaded_files):
+            st.rerun()
 
 with col2:
     st.subheader("📋 Documents")
