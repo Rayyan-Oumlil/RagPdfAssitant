@@ -12,6 +12,8 @@ import pickle
 import numpy as np
 from sentence_transformers import SentenceTransformer
 import faiss
+from datetime import datetime
+import base64
 
 # Page configuration
 st.set_page_config(
@@ -459,6 +461,59 @@ def get_available_models():
     
     return models
 
+# Export functions
+def export_conversations_to_json(chat_history):
+    """Export conversations to JSON format"""
+    export_data = {
+        "export_date": datetime.now().isoformat(),
+        "total_conversations": len(chat_history),
+        "conversations": []
+    }
+    
+    for i, chat in enumerate(chat_history):
+        conversation = {
+            "id": i + 1,
+            "question": chat["question"],
+            "answer": chat["answer"],
+            "model": chat["model"],
+            "sources_count": len(chat.get("sources", []))
+        }
+        export_data["conversations"].append(conversation)
+    
+    return json.dumps(export_data, indent=2, ensure_ascii=False)
+
+def export_conversations_to_text(chat_history):
+    """Export conversations to plain text format"""
+    text_content = f"RAG PDF Assistant - Conversation Export\n"
+    text_content += f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+    text_content += f"Total conversations: {len(chat_history)}\n"
+    text_content += "=" * 50 + "\n\n"
+    
+    for i, chat in enumerate(chat_history):
+        text_content += f"Conversation {i + 1}:\n"
+        text_content += f"Model: {chat['model']}\n"
+        text_content += f"Question: {chat['question']}\n"
+        text_content += f"Answer: {chat['answer']}\n"
+        text_content += "-" * 30 + "\n\n"
+    
+    return text_content
+
+def export_conversations_to_csv(chat_history):
+    """Export conversations to CSV format"""
+    csv_content = "ID,Model,Question,Answer,Sources Count\n"
+    
+    for i, chat in enumerate(chat_history):
+        question = chat['question'].replace('"', '""')  # Escape quotes
+        answer = chat['answer'].replace('"', '""')      # Escape quotes
+        csv_content += f'{i + 1},"{chat["model"]}","{question}","{answer}",{len(chat.get("sources", []))}\n'
+    
+    return csv_content
+
+def get_download_link(data, filename, file_type):
+    """Generate download link for files"""
+    b64 = base64.b64encode(data.encode()).decode()
+    return f'<a href="data:file/{file_type};base64,{b64}" download="{filename}">Download {filename}</a>'
+
 # Initialize RAG
 initialize_rag()
 
@@ -570,6 +625,50 @@ if st.button("🤖 Ask Question", type="primary", disabled=not question.strip())
 if st.session_state.chat_history:
     st.header("📝 Conversation History")
     
+    # Export section
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+    
+    with col1:
+        if st.button("📄 Export JSON", help="Export conversations as JSON"):
+            json_data = export_conversations_to_json(st.session_state.chat_history)
+            filename = f"conversations_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            st.download_button(
+                label="Download JSON",
+                data=json_data,
+                file_name=filename,
+                mime="application/json"
+            )
+    
+    with col2:
+        if st.button("📝 Export Text", help="Export conversations as text"):
+            text_data = export_conversations_to_text(st.session_state.chat_history)
+            filename = f"conversations_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+            st.download_button(
+                label="Download Text",
+                data=text_data,
+                file_name=filename,
+                mime="text/plain"
+            )
+    
+    with col3:
+        if st.button("📊 Export CSV", help="Export conversations as CSV"):
+            csv_data = export_conversations_to_csv(st.session_state.chat_history)
+            filename = f"conversations_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+            st.download_button(
+                label="Download CSV",
+                data=csv_data,
+                file_name=filename,
+                mime="text/csv"
+            )
+    
+    with col4:
+        if st.button("🗑️ Clear All", help="Clear all conversations", type="secondary"):
+            st.session_state.chat_history = []
+            st.rerun()
+    
+    st.markdown("---")
+    
+    # Display individual conversations
     for i, chat in enumerate(reversed(st.session_state.chat_history)):
         col1, col2 = st.columns([4, 1])
         
