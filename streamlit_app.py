@@ -13,7 +13,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 import faiss
 
-# Configuration de la page
+# Page configuration
 st.set_page_config(
     page_title="RAG PDF Assistant",
     page_icon="🧠",
@@ -21,12 +21,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Titre principal
-st.title("🧠 Assistant IA pour analyser vos documents PDF")
+# Main title
+st.title("🧠 AI Assistant to analyze your PDF documents")
 st.markdown("**Powered by Streamlit Cloud - LLMs Cloud Support**")
 st.markdown("---")
 
-# Variables de session
+# Session variables
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 if 'uploaded_files' not in st.session_state:
@@ -34,26 +34,26 @@ if 'uploaded_files' not in st.session_state:
 if 'rag_initialized' not in st.session_state:
     st.session_state.rag_initialized = False
 
-# Configuration RAG
+# RAG Configuration
 EMBEDDING_DIM = 384
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 
-# Initialiser le modèle d'embedding
+# Initialize embedding model
 @st.cache_resource
 def load_embedding_model():
     return SentenceTransformer('all-MiniLM-L6-v2')
 
 # Classes pour les LLMs Cloud
 class LLMProvider:
-    """Classe de base pour les fournisseurs de LLMs"""
+    """Base class for LLM providers"""
     
     def __init__(self, api_key: str = None):
-        # Essayer d'abord les secrets Streamlit, puis les variables d'environnement
+        # Try Streamlit secrets first, then environment variables
         if api_key:
             self.api_key = api_key
         else:
-            # Essayer les secrets Streamlit
+            # Try Streamlit secrets
             try:
                 if self.__class__.__name__ == "GoogleProvider":
                     self.api_key = st.secrets.get("GOOGLE_API_KEY")
@@ -66,24 +66,24 @@ class LLMProvider:
                 else:
                     self.api_key = None
             except:
-                # Fallback sur les variables d'environnement
+                # Fallback to environment variables
                 self.api_key = os.environ.get(f"{self.__class__.__name__.upper()}_API_KEY")
     
     def generate_response(self, prompt: str, **kwargs) -> str:
-        """Génère une réponse (à implémenter dans les classes enfants)"""
+        """Generates a response (to be implemented in child classes)"""
         raise NotImplementedError
 
 class GoogleProvider(LLMProvider):
-    """Fournisseur Google (Gemini)"""
+    """Google provider (Gemini)"""
     
     def __init__(self, api_key: str = None):
         super().__init__(api_key)
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
     
     def generate_response(self, prompt: str, model: str = "gemini-1.5-flash", max_tokens: int = 500) -> str:
-        """Génère une réponse avec Google Gemini"""
+        """Generates a response with Google Gemini"""
         if not self.api_key:
-            return "Erreur: Clé API Google manquante. Définissez GOOGLE_API_KEY dans vos variables d'environnement."
+            return "Error: Missing Google API key. Set GOOGLE_API_KEY in your environment variables."
         
         data = {
             "contents": [
@@ -110,22 +110,22 @@ class GoogleProvider(LLMProvider):
                 result = response.json()
                 return result["candidates"][0]["content"]["parts"][0]["text"].strip()
             else:
-                return f"Erreur Google API: {response.status_code} - {response.text}"
+                return f"Google API Error: {response.status_code} - {response.text}"
                 
         except Exception as e:
-            return f"Erreur lors de l'appel à Google: {str(e)}"
+            return f"Error calling Google: {str(e)}"
 
 class HuggingFaceProvider(LLMProvider):
-    """Fournisseur Hugging Face (modèles open source)"""
+    """Hugging Face provider (open source models)"""
     
     def __init__(self, api_key: str = None):
         super().__init__(api_key)
         self.base_url = "https://api-inference.huggingface.co/models"
     
     def generate_response(self, prompt: str, model: str = "gpt2", max_length: int = 500) -> str:
-        """Génère une réponse avec Hugging Face"""
+        """Generates a response with Hugging Face"""
         if not self.api_key:
-            return "Erreur: Clé API Hugging Face manquante. Définissez HUGGINGFACE_API_KEY dans vos variables d'environnement."
+            return "Error: Missing Hugging Face API key. Set HUGGINGFACE_API_KEY in your environment variables."
         
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -156,22 +156,22 @@ class HuggingFaceProvider(LLMProvider):
                 else:
                     return str(result)
             else:
-                return f"Erreur Hugging Face API: {response.status_code} - {response.text}"
+                return f"Hugging Face API Error: {response.status_code} - {response.text}"
                 
         except Exception as e:
-            return f"Erreur lors de l'appel à Hugging Face: {str(e)}"
+            return f"Error calling Hugging Face: {str(e)}"
 
 class OpenAIProvider(LLMProvider):
-    """Fournisseur OpenAI (GPT-3.5, GPT-4)"""
+    """OpenAI provider (GPT-3.5, GPT-4)"""
     
     def __init__(self, api_key: str = None):
         super().__init__(api_key)
         self.base_url = "https://api.openai.com/v1"
     
     def generate_response(self, prompt: str, model: str = "gpt-3.5-turbo", max_tokens: int = 500, temperature: float = 0.7) -> str:
-        """Génère une réponse avec OpenAI"""
+        """Generates a response with OpenAI"""
         if not self.api_key:
-            return "Erreur: Clé API OpenAI manquante. Définissez OPENAI_API_KEY dans vos variables d'environnement."
+            return "Error: Missing OpenAI API key. Set OPENAI_API_KEY in your environment variables."
         
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -181,7 +181,7 @@ class OpenAIProvider(LLMProvider):
         data = {
             "model": model,
             "messages": [
-                {"role": "system", "content": "Tu es un assistant qui répond uniquement basé sur le contexte fourni. Réponds de manière concise et précise."},
+                {"role": "system", "content": "You are an assistant that answers based only on the provided context. Answer concisely and accurately."},
                 {"role": "user", "content": prompt}
             ],
             "max_tokens": max_tokens,
@@ -199,22 +199,22 @@ class OpenAIProvider(LLMProvider):
             if response.status_code == 200:
                 return response.json()["choices"][0]["message"]["content"].strip()
             else:
-                return f"Erreur OpenAI API: {response.status_code} - {response.text}"
+                return f"OpenAI API Error: {response.status_code} - {response.text}"
                 
         except Exception as e:
-            return f"Erreur lors de l'appel à OpenAI: {str(e)}"
+            return f"Error calling OpenAI: {str(e)}"
 
 class AnthropicProvider(LLMProvider):
-    """Fournisseur Anthropic (Claude)"""
+    """Anthropic provider (Claude)"""
     
     def __init__(self, api_key: str = None):
         super().__init__(api_key)
         self.base_url = "https://api.anthropic.com/v1"
     
     def generate_response(self, prompt: str, model: str = "claude-3-sonnet-20240229", max_tokens: int = 500) -> str:
-        """Génère une réponse avec Anthropic Claude"""
+        """Generates a response with Anthropic Claude"""
         if not self.api_key:
-            return "Erreur: Clé API Anthropic manquante. Définissez ANTHROPIC_API_KEY dans vos variables d'environnement."
+            return "Error: Missing Anthropic API key. Set ANTHROPIC_API_KEY in your environment variables."
         
         headers = {
             "x-api-key": self.api_key,
@@ -241,12 +241,12 @@ class AnthropicProvider(LLMProvider):
             if response.status_code == 200:
                 return response.json()["content"][0]["text"].strip()
             else:
-                return f"Erreur Anthropic API: {response.status_code} - {response.text}"
+                return f"Anthropic API Error: {response.status_code} - {response.text}"
                 
         except Exception as e:
-            return f"Erreur lors de l'appel à Anthropic: {str(e)}"
+            return f"Error calling Anthropic: {str(e)}"
 
-# Dictionnaire des fournisseurs
+# Provider dictionary
 LLM_PROVIDERS = {
     "google": GoogleProvider,
     "huggingface": HuggingFaceProvider,
@@ -255,17 +255,17 @@ LLM_PROVIDERS = {
 }
 
 def get_llm_provider(provider_name: str):
-    """Retourne une instance du fournisseur LLM demandé"""
+    """Returns an instance of the requested LLM provider"""
     if provider_name.lower() in LLM_PROVIDERS:
         return LLM_PROVIDERS[provider_name.lower()]()
     return None
 
 def check_provider_credentials(provider_name: str) -> bool:
-    """Vérifie si les credentials sont disponibles pour un fournisseur"""
+    """Checks if credentials are available for a provider"""
     if provider_name.lower() not in LLM_PROVIDERS:
         return False
     
-    # Essayer d'abord les secrets Streamlit
+    # Try Streamlit secrets first
     try:
         if provider_name.lower() == "google" and st.secrets.get("GOOGLE_API_KEY"):
             return True
@@ -278,61 +278,61 @@ def check_provider_credentials(provider_name: str) -> bool:
     except:
         pass
     
-    # Fallback sur les variables d'environnement
+    # Fallback to environment variables
     env_var = f"{provider_name.upper()}_API_KEY"
     return bool(os.environ.get(env_var))
 
-# Initialiser le système RAG
+# Initialize RAG system
 def initialize_rag():
     if not st.session_state.rag_initialized:
-        # Créer le dossier data s'il n'existe pas
+        # Create data folder if it doesn't exist
         os.makedirs("data", exist_ok=True)
         
-        # Initialiser les variables globales
+        # Initialize global variables
         st.session_state.embed_model = load_embedding_model()
         st.session_state.index_path = "data/index.faiss"
         st.session_state.chunks_path = "data/doc_chunks.pkl"
         st.session_state.doc_chunks = []
         st.session_state.index = None
         
-        # Charger ou créer l'index FAISS
+        # Load or create FAISS index
         if os.path.exists(st.session_state.index_path):
             st.session_state.index = faiss.read_index(st.session_state.index_path)
         else:
             st.session_state.index = faiss.IndexFlatL2(EMBEDDING_DIM)
         
-        # Charger les chunks existants
+        # Load existing chunks
         if os.path.exists(st.session_state.chunks_path):
             with open(st.session_state.chunks_path, "rb") as f:
                 st.session_state.doc_chunks = pickle.load(f)
         
         st.session_state.rag_initialized = True
 
-# Fonctions utilitaires
+# Utility functions
 def extract_text_from_pdf(file) -> str:
-    """Extrait le texte d'un fichier PDF"""
+    """Extracts text from a PDF file"""
     try:
-        # Sauvegarder le fichier temporairement
+        # Save file temporarily
         with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp_file:
             tmp_file.write(file.getvalue())
             tmp_path = tmp_file.name
         
-        # Extraire le texte
+        # Extract text
         doc = fitz.open(tmp_path)
         text = ""
         for page in doc:
             text += page.get_text()
         doc.close()
         
-        # Nettoyer
+        # Clean up
         os.unlink(tmp_path)
         return text
     except Exception as e:
-        st.error(f"Erreur lors de l'extraction du texte: {e}")
+        st.error(f"Error extracting text: {e}")
         return ""
 
 def chunk_text(text: str) -> list:
-    """Découpe le texte en chunks"""
+    """Splits text into chunks"""
     if not text.strip():
         return []
     
@@ -358,42 +358,42 @@ def chunk_text(text: str) -> list:
     return chunks
 
 def add_document_to_index(file):
-    """Ajoute un document à l'index"""
+    """Adds a document to the index"""
     text = extract_text_from_pdf(file)
     if not text:
-        return False, "Impossible d'extraire le texte du PDF"
+        return False, "Unable to extract text from PDF"
     
     chunks = chunk_text(text)
     if not chunks:
-        return False, "Aucun contenu textuel trouvé"
+        return False, "No textual content found"
     
-    # Ajouter les chunks
+    # Add chunks
     st.session_state.doc_chunks.extend(chunks)
     
-    # Créer les embeddings
+    # Create embeddings
     embeddings = st.session_state.embed_model.encode(chunks)
     st.session_state.index.add(np.array(embeddings))
     
-    # Sauvegarder
+    # Save
     faiss.write_index(st.session_state.index, st.session_state.index_path)
     with open(st.session_state.chunks_path, "wb") as f:
         pickle.dump(st.session_state.doc_chunks, f)
     
-    return True, f"Document ajouté avec {len(chunks)} chunks"
+    return True, f"Document added with {len(chunks)} chunks"
 
 def ask_question(question: str, model: str) -> dict:
-    """Pose une question au système RAG"""
+    """Asks a question to the RAG system"""
     if not st.session_state.doc_chunks:
         return {
-            "answer": "Aucun document n'est indexé. Veuillez d'abord uploader un PDF.",
+            "answer": "No documents are indexed. Please upload a PDF first.",
             "sources": []
         }
     
-    # Recherche sémantique
+    # Semantic search
     question_vec = st.session_state.embed_model.encode([question])
     D, I = st.session_state.index.search(np.array(question_vec), 5)
     
-    # Récupérer les sources
+    # Get sources
     sources = []
     for i in I[0]:
         if 0 <= i < len(st.session_state.doc_chunks):
@@ -401,14 +401,14 @@ def ask_question(question: str, model: str) -> dict:
     
     if not sources:
         return {
-            "answer": "Aucune information pertinente trouvée dans les documents.",
+            "answer": "No relevant information found in the documents.",
             "sources": []
         }
     
-    # Créer le contexte
-    context = "\n\n".join(sources[:3])  # Limiter à 3 sources
+    # Create context
+    context = "\n\n".join(sources[:3])  # Limit to 3 sources
     
-    # Utiliser un LLM cloud
+    # Use cloud LLM
     if model.startswith("cloud:"):
         provider_name = model.replace("cloud:", "")
         provider = get_llm_provider(provider_name)
@@ -425,9 +425,9 @@ Give a short, direct answer. Do not add extra information not found in the conte
             
             answer = provider.generate_response(prompt)
         else:
-            answer = f"Fournisseur {provider_name} non configuré. Vérifiez vos clés API."
+            answer = f"Provider {provider_name} not configured. Check your API keys."
     else:
-        answer = f"Modèle {model} non reconnu."
+        answer = f"Model {model} not recognized."
     
     return {
         "answer": answer,
@@ -435,59 +435,59 @@ Give a short, direct answer. Do not add extra information not found in the conte
     }
 
 def reset_index():
-    """Réinitialise l'index"""
+    """Resets the index"""
     st.session_state.doc_chunks = []
-    st.session_state.uploaded_files = []  # Vider la liste des documents uploadés
+    st.session_state.uploaded_files = []  # Clear uploaded files list
     st.session_state.index = faiss.IndexFlatL2(EMBEDDING_DIM)
     
-    # Supprimer les fichiers
+    # Delete files
     if os.path.exists(st.session_state.index_path):
         os.remove(st.session_state.index_path)
     if os.path.exists(st.session_state.chunks_path):
         os.remove(st.session_state.chunks_path)
     
-    return True, "Index réinitialisé avec succès"
+    return True, "Index reset successfully"
 
 def get_available_models():
-    """Récupère la liste des modèles disponibles"""
+    """Gets the list of available models"""
     models = []
     
-    # Ajouter les modèles cloud configurés
+    # Add configured cloud models
     for provider in ["google", "huggingface", "openai", "anthropic"]:
         if check_provider_credentials(provider):
             models.append(f"cloud:{provider}")
     
     return models
 
-# Initialiser le RAG
+# Initialize RAG
 initialize_rag()
 
-# Sidebar pour les contrôles
+# Sidebar for controls
 with st.sidebar:
     st.header("⚙️ Configuration")
     
-    # Statut du système
-    st.subheader("📊 Statut du système")
+    # System status
+    st.subheader("📊 System Status")
     doc_count = len(st.session_state.doc_chunks)
-    st.write(f"Documents indexés: {doc_count}")
+    st.write(f"Indexed documents: {doc_count}")
     
     if doc_count > 0:
-        st.write(f"Chunks totaux: {len(st.session_state.doc_chunks)}")
-        st.write(f"Taille de l'index: {st.session_state.index.ntotal}")
+        st.write(f"Total chunks: {len(st.session_state.doc_chunks)}")
+        st.write(f"Index size: {st.session_state.index.ntotal}")
     
-    # Modèles disponibles
-    st.subheader("🤖 Modèles disponibles")
+    # Available models
+    st.subheader("🤖 Available Models")
     models = get_available_models()
     for model in models:
         provider = model.replace("cloud:", "")
         st.write(f"• {model} (LLM cloud)")
     
     if not models:
-        st.warning("Aucun LLM cloud configuré. Ajoutez vos clés API dans les secrets.")
+        st.warning("No cloud LLM configured. Add your API keys in the secrets.")
     
     # Actions
     st.subheader("🔄 Actions")
-    if st.button("Réinitialiser l'index", type="secondary"):
+    if st.button("Reset Index", type="secondary"):
         success, message = reset_index()
         if success:
             st.success(message)
@@ -495,21 +495,21 @@ with st.sidebar:
         else:
             st.error(message)
 
-# Zone principale
+# Main area
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    st.header("📄 Upload de documents")
+    st.header("📄 Document Upload")
     
     uploaded_file = st.file_uploader(
-        "Choisissez un fichier PDF",
+        "Choose a PDF file",
         type=['pdf'],
-        help="Sélectionnez un fichier PDF à analyser"
+        help="Select a PDF file to analyze"
     )
     
     if uploaded_file is not None:
-        if st.button("📤 Uploader le document", type="primary"):
-            with st.spinner("Upload et indexation en cours..."):
+        if st.button("📤 Upload Document", type="primary"):
+            with st.spinner("Upload and indexing in progress..."):
                 success, message = add_document_to_index(uploaded_file)
                 if success:
                     st.success(message)
@@ -519,44 +519,44 @@ with col1:
                     st.error(message)
 
 with col2:
-    st.header("📋 Documents uploadés")
+    st.header("📋 Uploaded Documents")
     if st.session_state.uploaded_files:
         for file in st.session_state.uploaded_files:
             st.write(f"• {file}")
     else:
-        st.info("Aucun document uploadé")
+        st.info("No documents uploaded")
 
-# Zone de chat
-st.header("💬 Chat avec l'assistant")
+# Chat area
+st.header("💬 Chat with Assistant")
 
-# Sélection du modèle
+# Model selection
 available_models = get_available_models()
 if available_models:
     selected_model = st.selectbox(
-        "Choisissez un modèle:",
+        "Choose a model:",
         available_models,
-        help="Sélectionnez le modèle à utiliser"
+        help="Select the model to use"
     )
 else:
-    st.error("Aucun LLM cloud configuré. Configurez vos clés API dans les secrets Streamlit.")
+    st.error("No cloud LLM configured. Configure your API keys in Streamlit secrets.")
     st.stop()
 
-# Zone de saisie de question
+# Question input area
 question = st.text_area(
-    "Posez votre question:",
-    placeholder="Ex: De quoi parle ce document ? Quels sont les points clés ?",
+    "Ask your question:",
+    placeholder="Ex: What is this document about? What are the key points?",
     height=100
 )
 
-# Bouton pour poser la question
-if st.button("🤖 Poser la question", type="primary", disabled=not question.strip()):
+# Button to ask question
+if st.button("🤖 Ask Question", type="primary", disabled=not question.strip()):
     if not question.strip():
-        st.warning("Veuillez saisir une question.")
+        st.warning("Please enter a question.")
     else:
-        with st.spinner("Recherche en cours..."):
+        with st.spinner("Searching..."):
             response = ask_question(question, selected_model)
             
-            # Ajouter à l'historique
+            # Add to history
             st.session_state.chat_history.append({
                 "question": question,
                 "answer": response.get("answer", ""),
@@ -566,9 +566,9 @@ if st.button("🤖 Poser la question", type="primary", disabled=not question.str
             
             st.rerun()
 
-# Affichage de l'historique
+# Display history
 if st.session_state.chat_history:
-    st.header("📝 Historique des conversations")
+    st.header("📝 Conversation History")
     
     for i, chat in enumerate(reversed(st.session_state.chat_history)):
         col1, col2 = st.columns([4, 1])
@@ -576,15 +576,15 @@ if st.session_state.chat_history:
         with col1:
             with st.expander(f"Question {len(st.session_state.chat_history) - i}: {chat['question'][:50]}..."):
                 st.write(f"**Question:** {chat['question']}")
-                st.write(f"**Modèle utilisé:** {chat['model']}")
-                st.write(f"**Réponse:** {chat['answer']}")
+                st.write(f"**Model used:** {chat['model']}")
+                st.write(f"**Answer:** {chat['answer']}")
                 
-                # Sources supprimées pour une interface plus propre
+                # Sources removed for cleaner interface
         
         with col2:
-            # Bouton de suppression
-            if st.button("🗑️", key=f"delete_{i}", help="Supprimer cette question"):
-                # Supprimer la question de l'historique
+            # Delete button
+            if st.button("🗑️", key=f"delete_{i}", help="Delete this question"):
+                # Remove question from history
                 index_to_delete = len(st.session_state.chat_history) - 1 - i
                 st.session_state.chat_history.pop(index_to_delete)
                 st.rerun()
@@ -595,7 +595,7 @@ st.markdown(
     """
     <div style='text-align: center; color: #666;'>
         <p>🧠 RAG PDF Assistant - Powered by Streamlit Cloud</p>
-        <p>Analysez vos documents PDF avec l'IA et les LLMs cloud</p>
+        <p>Analyze your PDF documents with AI and cloud LLMs</p>
     </div>
     """,
     unsafe_allow_html=True

@@ -1,30 +1,30 @@
 # 🧠 RAG PDF Assistant
 
-Un assistant IA intelligent pour analyser vos documents PDF en utilisant la technologie RAG (Retrieval-Augmented Generation) et les LLMs cloud sur Streamlit Cloud.
+An intelligent AI assistant to analyze your PDF documents using RAG (Retrieval-Augmented Generation) technology and cloud LLMs on Streamlit Cloud.
 
-## ✨ Fonctionnalités
+## ✨ Features
 
-- 📄 **Upload PDF** : Interface drag & drop pour uploader vos documents
-- 🤖 **LLMs Cloud** : Support complet pour Google Gemini, Hugging Face, OpenAI, Anthropic
-- 🔍 **RAG System** : Recherche sémantique dans vos documents
-- 💬 **Chat intelligent** : Posez des questions sur vos documents
-- 📊 **Interface moderne** : Design responsive avec Streamlit
-- 📝 **Historique** : Conversations sauvegardées
-- 🚀 **Déploiement cloud** : Prêt pour Streamlit Cloud
+- 📄 **PDF Upload** : Drag & drop interface to upload your documents
+- 🤖 **Cloud LLMs** : Full support for Google Gemini, Hugging Face, OpenAI, Anthropic
+- 🔍 **RAG System** : Semantic search in your documents
+- 💬 **Smart Chat** : Ask questions about your documents
+- 📊 **Modern Interface** : Responsive design with Streamlit
+- 📝 **History** : Saved conversations
+- 🚀 **Cloud Deployment** : Ready for Streamlit Cloud
 
-## 🚀 Déploiement
+## 🚀 Deployment
 
-### Streamlit Cloud (Recommandé)
+### Streamlit Cloud (Recommended)
 
-1. **Forkez ce repository** sur GitHub
-2. **Allez sur** [share.streamlit.io](https://share.streamlit.io)
-3. **Connectez-vous** avec votre compte GitHub
-4. **Créez une nouvelle app** :
-   - **Repository** : `votre-username/rag-assistant`
+1. **Fork this repository** on GitHub
+2. **Go to** [share.streamlit.io](https://share.streamlit.io)
+3. **Sign in** with your GitHub account
+4. **Create a new app**:
+   - **Repository** : `your-username/rag-assistant`
    - **Branch** : `main`
    - **Main file path** : `streamlit_app.py`
-5. **Configurez les variables d'environnement** (voir section Configuration)
-6. **Cliquez sur "Deploy"**
+5. **Configure environment variables** (see Configuration section)
+6. **Click "Deploy"**
 
 ### Local
 
@@ -32,136 +32,136 @@ Un assistant IA intelligent pour analyser vos documents PDF en utilisant la tech
 # Installation
 pip install -r requirements.txt
 
-# Démarrage
+# Start
 streamlit run streamlit_app.py
 ```
 
-## 🎯 Utilisation
+## 🎯 Usage
 
-1. **Upload** un fichier PDF
-2. **Sélectionnez** un modèle (local ou cloud)
-3. **Posez** vos questions
-4. **Consultez** les réponses et sources
+1. **Upload** a PDF file
+2. **Select** a model (local or cloud)
+3. **Ask** your questions
+4. **View** answers and sources
 
 ## 📁 Structure
 
 ```
 rag-assistant/
-├── streamlit_app.py          # Application principale
-├── requirements.txt          # Dépendances
+├── streamlit_app.py          # Main application
+├── requirements.txt          # Dependencies
 ├── .streamlit/
-│   └── config.toml          # Configuration Streamlit
-├── README.md                # Ce fichier
-└── .gitignore              # Fichiers à ignorer
+│   └── config.toml          # Streamlit configuration
+├── README.md                # This file
+└── .gitignore              # Files to ignore
 ```
 
 ## 🛠️ Technologies
 
-- **Streamlit** : Interface web
-- **PyMuPDF** : Traitement PDF
+- **Streamlit** : Web interface
+- **PyMuPDF** : PDF processing
 - **SentenceTransformers** : Embeddings
-- **FAISS** : Index vectoriel
-- **NumPy** : Calculs numériques
-- **LLMs Cloud** : Google, Hugging Face, OpenAI, Anthropic
+- **FAISS** : Vector index
+- **NumPy** : Numerical computations
+- **Cloud LLMs** : Google, Hugging Face, OpenAI, Anthropic
 
 ## 🔧 Configuration
 
-### Variables d'environnement
+### Environment Variables
 
-Pour utiliser les LLMs cloud, configurez ces variables dans Streamlit Cloud :
+To use cloud LLMs, configure these variables in Streamlit Cloud:
 
 ```bash
 # Google Gemini
-GOOGLE_API_KEY=votre_clé_google
+GOOGLE_API_KEY=your_google_key
 
 # Hugging Face
-HUGGINGFACE_API_KEY=votre_clé_huggingface
+HUGGINGFACE_API_KEY=your_huggingface_key
 
 # OpenAI
-OPENAI_API_KEY=votre_clé_openai
+OPENAI_API_KEY=your_openai_key
 
 # Anthropic Claude
-ANTHROPIC_API_KEY=votre_clé_anthropic
+ANTHROPIC_API_KEY=your_anthropic_key
 ```
 
-### Comment obtenir les clés API
+### How to get API keys
 
 - **Google Gemini** : [Google AI Studio](https://makersuite.google.com/app/apikey)
 - **Hugging Face** : [Hugging Face Settings](https://huggingface.co/settings/tokens)
 - **OpenAI** : [OpenAI Platform](https://platform.openai.com/api-keys)
 - **Anthropic** : [Anthropic Console](https://console.anthropic.com/)
 
-## 📊 Fonctionnalités RAG
+## 📊 RAG Features
 
-- **Extraction de texte** : PyMuPDF pour les PDFs
-- **Chunking** : Découpage intelligent en morceaux
+- **Text extraction** : PyMuPDF for PDFs
+- **Chunking** : Intelligent text splitting
 - **Embeddings** : SentenceTransformers (all-MiniLM-L6-v2)
-- **Index vectoriel** : FAISS pour la recherche rapide
-- **Recherche sémantique** : Similarité cosinus
-- **LLMs Cloud** : Génération de réponses intelligentes
+- **Vector index** : FAISS for fast search
+- **Semantic search** : Cosine similarity
+- **Cloud LLMs** : Intelligent response generation
 
-## 🤖 LLMs Supportés
+## 🤖 Supported LLMs
 
-### Mode Local
-- **Recherche locale** : Basé sur la similarité sémantique
+### Local Mode
+- **Local search** : Based on semantic similarity
 
-### Mode Cloud
+### Cloud Mode
 - **Google Gemini** : `gemini-1.5-flash`
-- **Hugging Face** : Modèles open source (gpt2, etc.)
+- **Hugging Face** : Open source models (gpt2, etc.)
 - **OpenAI** : GPT-3.5-turbo, GPT-4
 - **Anthropic** : Claude-3-sonnet
 
 ## 🎨 Interface
 
-- **Design moderne** : Interface intuitive et responsive
-- **Upload drag & drop** : Glissez-déposez vos PDFs
-- **Chat interactif** : Posez des questions naturellement
-- **Historique** : Consultez vos conversations précédentes
-- **Statut en temps réel** : Suivez l'état de votre index
-- **Statut des clés API** : Vérifiez la configuration
+- **Modern design** : Intuitive and responsive interface
+- **Drag & drop upload** : Drag and drop your PDFs
+- **Interactive chat** : Ask questions naturally
+- **History** : View your previous conversations
+- **Real-time status** : Track your index status
+- **API key status** : Check configuration
 
 ## 🚀 Performance
 
-- **Indexation rapide** : FAISS pour la recherche ultra-rapide
-- **Cache intelligent** : Modèles chargés une seule fois
-- **Optimisation mémoire** : Gestion efficace des ressources
-- **Upload optimisé** : Traitement asynchrone des fichiers
-- **LLMs cloud** : Réponses de haute qualité
+- **Fast indexing** : FAISS for ultra-fast search
+- **Smart caching** : Models loaded only once
+- **Memory optimization** : Efficient resource management
+- **Optimized upload** : Asynchronous file processing
+- **Cloud LLMs** : High-quality responses
 
-## 🔒 Sécurité
+## 🔒 Security
 
-- **Variables d'environnement** : Clés API sécurisées
-- **Validation des fichiers** : Vérification des types PDF
-- **Limites de taille** : Protection contre les fichiers trop gros
-- **Isolation** : Environnements séparés
+- **Environment variables** : Secure API keys
+- **File validation** : PDF type verification
+- **Size limits** : Protection against oversized files
+- **Isolation** : Separate environments
 
-## 🛠️ Dépannage
+## 🛠️ Troubleshooting
 
-### Problèmes courants
+### Common issues
 
-1. **"Clé API manquante"**
-   - Vérifiez les variables d'environnement dans Streamlit Cloud
-   - Assurez-vous que les clés sont correctes
+1. **"Missing API key"**
+   - Check environment variables in Streamlit Cloud
+   - Make sure keys are correct
 
-2. **"Modèle non disponible"**
-   - Vérifiez que la clé API correspondante est configurée
-   - Redéployez après modification des variables
+2. **"Model not available"**
+   - Verify that the corresponding API key is configured
+   - Redeploy after modifying variables
 
-3. **"Erreur d'upload"**
-   - Vérifiez que le fichier est un PDF valide
-   - Assurez-vous que la taille ne dépasse pas 200MB
+3. **"Upload error"**
+   - Check that the file is a valid PDF
+   - Make sure size doesn't exceed 200MB
 
-## 🤝 Contribution
+## 🤝 Contributing
 
-Les contributions sont les bienvenues ! N'hésitez pas à :
-- Ouvrir une issue pour signaler un bug
-- Proposer une amélioration
-- Soumettre une pull request
+Contributions are welcome! Feel free to:
+- Open an issue to report a bug
+- Propose an improvement
+- Submit a pull request
 
-## 📄 Licence
+## 📄 License
 
 MIT License
 
 ---
 
-**🎉 Votre assistant RAG avec LLMs cloud est maintenant prêt pour Streamlit Cloud !** 
+**🎉 Your RAG assistant with cloud LLMs is now ready for Streamlit Cloud!** 
