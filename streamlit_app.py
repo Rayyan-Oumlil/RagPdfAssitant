@@ -21,6 +21,72 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Dark mode configuration
+if 'dark_mode' not in st.session_state:
+    st.session_state.dark_mode = False
+
+# Apply dark mode CSS
+def apply_dark_mode():
+    if st.session_state.dark_mode:
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #0e1117;
+            color: #fafafa;
+        }
+        .stSidebar {
+            background-color: #262730;
+        }
+        .stButton > button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .stTextInput > div > div > input {
+            background-color: #262730;
+            color: #fafafa;
+        }
+        .stTextArea > div > div > textarea {
+            background-color: #262730;
+            color: #fafafa;
+        }
+        .stSelectbox > div > div > select {
+            background-color: #262730;
+            color: #fafafa;
+        }
+        .stFileUploader > div > div {
+            background-color: #262730;
+            color: #fafafa;
+        }
+        .stExpander > div > div {
+            background-color: #262730;
+            color: #fafafa;
+        }
+        .stMetric > div > div {
+            background-color: #262730;
+            color: #fafafa;
+        }
+        .stAlert {
+            background-color: #262730;
+            color: #fafafa;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #ffffff;
+            color: #31333f;
+        }
+        .stSidebar {
+            background-color: #f0f2f6;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+# Apply the theme
+apply_dark_mode()
+
 # Main title
 st.title("🧠 AI Assistant to analyze your PDF documents")
 st.markdown("**Powered by Streamlit Cloud - LLMs Cloud Support**")
@@ -465,6 +531,15 @@ initialize_rag()
 # Sidebar for controls
 with st.sidebar:
     st.header("⚙️ Configuration")
+    
+    # Dark mode toggle
+    st.subheader("🎨 Theme")
+    dark_mode = st.toggle("🌙 Dark Mode", value=st.session_state.dark_mode, help="Switch between light and dark themes")
+    if dark_mode != st.session_state.dark_mode:
+        st.session_state.dark_mode = dark_mode
+        st.rerun()
+    
+    st.markdown("---")
     
     # System status
     st.subheader("📊 System Status")
