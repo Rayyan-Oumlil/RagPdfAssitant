@@ -1,168 +1,167 @@
 # 🧠 RAG PDF Assistant
 
-A local AI assistant that lets you upload **PDF files** and ask **questions** about them using **RAG (Retrieval-Augmented Generation)**. It runs **fully offline** using a local LLM like Mistral via [Ollama](https://ollama.com), and uses `FAISS` + `sentence-transformers` for semantic search.
+Un assistant IA intelligent pour analyser vos documents PDF en utilisant la technologie RAG (Retrieval-Augmented Generation) et les LLMs cloud sur Streamlit Cloud.
 
-> Built with FastAPI, PyMuPDF, FAISS, and Mistral LLM.
+## ✨ Fonctionnalités
 
----
+- 📄 **Upload PDF** : Interface drag & drop pour uploader vos documents
+- 🤖 **LLMs Cloud** : Support complet pour Google Gemini, Hugging Face, OpenAI, Anthropic
+- 🔍 **RAG System** : Recherche sémantique dans vos documents
+- 💬 **Chat intelligent** : Posez des questions sur vos documents
+- 📊 **Interface moderne** : Design responsive avec Streamlit
+- 📝 **Historique** : Conversations sauvegardées
+- 🚀 **Déploiement cloud** : Prêt pour Streamlit Cloud
 
-## 📦 Features
+## 🚀 Déploiement
 
-- 🔍 Extracts text from PDF files
-- 🧠 Splits and embeds document chunks
-- 🔎 Retrieves relevant content using vector search (FAISS)
-- 🤖 Answers questions using a local LLM (Mistral)
-- 💾 Works fully offline (no OpenAI API needed)
-- 🔧 Easy to extend with Streamlit, React, or Docker
+### Streamlit Cloud (Recommandé)
 
----
+1. **Forkez ce repository** sur GitHub
+2. **Allez sur** [share.streamlit.io](https://share.streamlit.io)
+3. **Connectez-vous** avec votre compte GitHub
+4. **Créez une nouvelle app** :
+   - **Repository** : `votre-username/rag-assistant`
+   - **Branch** : `main`
+   - **Main file path** : `streamlit_app.py`
+5. **Configurez les variables d'environnement** (voir section Configuration)
+6. **Cliquez sur "Deploy"**
 
-## 🚀 Tech Stack
+### Local
 
-| Category   | Tools Used                           |
-|------------|---------------------------------------|
-| Backend    | FastAPI, Python                      |
-| AI / NLP   | Mistral (via Ollama), SentenceTransformers |
-| Embeddings | all-MiniLM-L6-v2                     |
-| Vector DB  | FAISS                                |
-| File I/O   | PyMuPDF                              |
-| Optional   | Streamlit or React (for UI)          |
+```bash
+# Installation
+pip install -r requirements.txt
 
----
+# Démarrage
+streamlit run streamlit_app.py
+```
 
-## 📁 Project Structure
+## 🎯 Utilisation
+
+1. **Upload** un fichier PDF
+2. **Sélectionnez** un modèle (local ou cloud)
+3. **Posez** vos questions
+4. **Consultez** les réponses et sources
+
+## 📁 Structure
 
 ```
 rag-assistant/
-├── backend/               # FastAPI backend
-│   ├── main.py            # API endpoints
-│   ├── rag.py             # RAG logic (embedding + retrieval)
-│   └── utils.py           # PDF parsing + chunking
-├── data/                  # Uploaded files & FAISS index
-├── models/                # Optional LLM/config files
-├── requirements.txt       # Python dependencies
-├── .gitignore             # Ignore cache, env, FAISS index
-└── README.md              # You're here!
+├── streamlit_app.py          # Application principale
+├── requirements.txt          # Dépendances
+├── .streamlit/
+│   └── config.toml          # Configuration Streamlit
+├── README.md                # Ce fichier
+└── .gitignore              # Fichiers à ignorer
 ```
 
----
+## 🛠️ Technologies
 
-## ⚙️ Requirements
+- **Streamlit** : Interface web
+- **PyMuPDF** : Traitement PDF
+- **SentenceTransformers** : Embeddings
+- **FAISS** : Index vectoriel
+- **NumPy** : Calculs numériques
+- **LLMs Cloud** : Google, Hugging Face, OpenAI, Anthropic
 
-- Python 3.10+
-- [Ollama](https://ollama.com) (for local LLMs)
-- Git, pip
+## 🔧 Configuration
 
----
+### Variables d'environnement
 
-## 🧪 Setup Instructions
-
-### 1. Clone the Repo
+Pour utiliser les LLMs cloud, configurez ces variables dans Streamlit Cloud :
 
 ```bash
-git clone https://github.com/Rayyan-Oumlil/RagPdfAssitant.git
-cd RagPdfAssitant
+# Google Gemini
+GOOGLE_API_KEY=votre_clé_google
+
+# Hugging Face
+HUGGINGFACE_API_KEY=votre_clé_huggingface
+
+# OpenAI
+OPENAI_API_KEY=votre_clé_openai
+
+# Anthropic Claude
+ANTHROPIC_API_KEY=votre_clé_anthropic
 ```
 
-### 2. Create a Virtual Environment (optional)
+### Comment obtenir les clés API
 
-```bash
-python -m venv venv
-venv\Scripts\activate  # Windows
-```
+- **Google Gemini** : [Google AI Studio](https://makersuite.google.com/app/apikey)
+- **Hugging Face** : [Hugging Face Settings](https://huggingface.co/settings/tokens)
+- **OpenAI** : [OpenAI Platform](https://platform.openai.com/api-keys)
+- **Anthropic** : [Anthropic Console](https://console.anthropic.com/)
 
-### 3. Install Dependencies
+## 📊 Fonctionnalités RAG
 
-```bash
-pip install -r requirements.txt
-```
+- **Extraction de texte** : PyMuPDF pour les PDFs
+- **Chunking** : Découpage intelligent en morceaux
+- **Embeddings** : SentenceTransformers (all-MiniLM-L6-v2)
+- **Index vectoriel** : FAISS pour la recherche rapide
+- **Recherche sémantique** : Similarité cosinus
+- **LLMs Cloud** : Génération de réponses intelligentes
 
-### 4. Start Ollama + Download the Mistral Model
+## 🤖 LLMs Supportés
 
-```bash
-ollama run mistral
-```
+### Mode Local
+- **Recherche locale** : Basé sur la similarité sémantique
 
-> The first time, it will download ~4.1GB. Keep this terminal open.
+### Mode Cloud
+- **Google Gemini** : `gemini-1.5-flash`
+- **Hugging Face** : Modèles open source (gpt2, etc.)
+- **OpenAI** : GPT-3.5-turbo, GPT-4
+- **Anthropic** : Claude-3-sonnet
 
-### 5. Start the FastAPI Server
+## 🎨 Interface
 
-Open another terminal and run:
+- **Design moderne** : Interface intuitive et responsive
+- **Upload drag & drop** : Glissez-déposez vos PDFs
+- **Chat interactif** : Posez des questions naturellement
+- **Historique** : Consultez vos conversations précédentes
+- **Statut en temps réel** : Suivez l'état de votre index
+- **Statut des clés API** : Vérifiez la configuration
 
-```bash
-uvicorn backend.main:app --reload
-```
+## 🚀 Performance
 
-Visit the docs at:  
-📎 http://127.0.0.1:8000/docs
+- **Indexation rapide** : FAISS pour la recherche ultra-rapide
+- **Cache intelligent** : Modèles chargés une seule fois
+- **Optimisation mémoire** : Gestion efficace des ressources
+- **Upload optimisé** : Traitement asynchrone des fichiers
+- **LLMs cloud** : Réponses de haute qualité
+
+## 🔒 Sécurité
+
+- **Variables d'environnement** : Clés API sécurisées
+- **Validation des fichiers** : Vérification des types PDF
+- **Limites de taille** : Protection contre les fichiers trop gros
+- **Isolation** : Environnements séparés
+
+## 🛠️ Dépannage
+
+### Problèmes courants
+
+1. **"Clé API manquante"**
+   - Vérifiez les variables d'environnement dans Streamlit Cloud
+   - Assurez-vous que les clés sont correctes
+
+2. **"Modèle non disponible"**
+   - Vérifiez que la clé API correspondante est configurée
+   - Redéployez après modification des variables
+
+3. **"Erreur d'upload"**
+   - Vérifiez que le fichier est un PDF valide
+   - Assurez-vous que la taille ne dépasse pas 200MB
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à :
+- Ouvrir une issue pour signaler un bug
+- Proposer une amélioration
+- Soumettre une pull request
+
+## 📄 Licence
+
+MIT License
 
 ---
 
-## 📡 API Endpoints
-
-### ➕ POST /upload
-
-- Upload and index a PDF file  
-- **Form field:** `file: UploadFile`
-
-### ❓ POST /ask
-
-- Ask a question about the uploaded content  
-- **Form field:** `question: str`
-
----
-
-## 🧠 How It Works (RAG Flow)
-
-1. Upload a PDF
-2. Text is extracted and split into small chunks
-3. Chunks are embedded with `sentence-transformers`
-4. Embeddings stored in FAISS
-5. When a question is asked:
-    - It's embedded
-    - Top chunks are retrieved from FAISS
-    - Chunks + question are passed to the LLM (Mistral via Ollama)
-    - A natural language answer is generated
-
----
-
-## 🧱 Python Dependencies
-
-```
-fastapi
-uvicorn
-pymupdf
-sentence-transformers
-faiss-cpu
-python-multipart
-```
-
----
-
-## 🛡️ Limitations
-
-- Not production-ready (no auth, rate-limiting, or sanitization)
-- Currently only supports `.pdf` files
-- Mistral output quality may vary; no fine-tuning applied
-
----
-
-## ✅ TODO / Improvements
-
-- [ ] Add Streamlit or React UI
-- [ ] Add citations and source highlighting
-- [ ] Support multiple documents / users
-- [ ] Dockerize the project
-- [ ] Add `.txt` file support
-
----
-
-## 👨‍💻 Author
-
-**Built by [Rayyan Oumlil](https://github.com/Rayyan-Oumlil)**
-
----
-
-## 📝 License
-
-MIT License. Free to use, modify, and share.
+**🎉 Votre assistant RAG avec LLMs cloud est maintenant prêt pour Streamlit Cloud !** 

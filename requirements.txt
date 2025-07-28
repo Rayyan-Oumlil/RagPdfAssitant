@@ -1,6 +1,15 @@
-fastapi
-uvicorn
-pymupdf
-sentence-transformers
-faiss-cpu
-python-multipart
+# Core dependencies
+streamlit>=1.28.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# PDF processing
+pymupdf>=1.23.0
+
+# AI and ML
+sentence-transformers>=2.2.0
+faiss-cpu>=1.7.4
+numpy>=1.24.0
+
+# Data processing
+pandas>=2.0.0
