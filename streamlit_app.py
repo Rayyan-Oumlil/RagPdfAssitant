@@ -599,10 +599,7 @@ if st.session_state.chat_history:
             st.write(f"**Modèle utilisé:** {chat['model']}")
             st.write(f"**Réponse:** {chat['answer']}")
             
-            if chat['sources']:
-                st.write("**Sources:**")
-                for j, source in enumerate(chat['sources'][:3]):
-                    st.write(f"{j+1}. {source[:200]}...")
+            # Sources supprimées pour une interface plus propre
 
 # Footer
 st.markdown("---")
