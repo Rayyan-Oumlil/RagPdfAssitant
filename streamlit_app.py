@@ -381,7 +381,7 @@ def add_document_to_index(file):
     
     return True, f"Document ajouté avec {len(chunks)} chunks"
 
-def ask_question(question: str, model: str = "local") -> dict:
+def ask_question(question: str, model: str) -> dict:
     """Pose une question au système RAG"""
     if not st.session_state.doc_chunks:
         return {
@@ -408,12 +408,8 @@ def ask_question(question: str, model: str = "local") -> dict:
     # Créer le contexte
     context = "\n\n".join(sources[:3])  # Limiter à 3 sources
     
-    # Générer la réponse
-    if model == "local":
-        # Réponse simple basée sur le contexte
-        answer = f"Basé sur les documents, voici ce que j'ai trouvé :\n\n{context[:500]}..."
-    elif model.startswith("cloud:"):
-        # Utiliser un LLM cloud
+    # Utiliser un LLM cloud
+    if model.startswith("cloud:"):
         provider_name = model.replace("cloud:", "")
         provider = get_llm_provider(provider_name)
         
@@ -453,7 +449,7 @@ def reset_index():
 
 def get_available_models():
     """Récupère la liste des modèles disponibles"""
-    models = ["local"]
+    models = []
     
     # Ajouter les modèles cloud configurés
     for provider in ["google", "huggingface", "openai", "anthropic"]:
@@ -482,11 +478,11 @@ with st.sidebar:
     st.subheader("🤖 Modèles disponibles")
     models = get_available_models()
     for model in models:
-        if model == "local":
-            st.write(f"• {model} (recherche locale)")
-        else:
-            provider = model.replace("cloud:", "")
-            st.write(f"• {model} (LLM cloud)")
+        provider = model.replace("cloud:", "")
+        st.write(f"• {model} (LLM cloud)")
+    
+    if not models:
+        st.warning("Aucun LLM cloud configuré. Ajoutez vos clés API dans les secrets.")
     
     # Statut des clés API
     st.subheader("🔑 Clés API")
@@ -558,11 +554,15 @@ st.header("💬 Chat avec l'assistant")
 
 # Sélection du modèle
 available_models = get_available_models()
-selected_model = st.selectbox(
-    "Choisissez un modèle:",
-    available_models,
-    help="Sélectionnez le modèle à utiliser"
-)
+if available_models:
+    selected_model = st.selectbox(
+        "Choisissez un modèle:",
+        available_models,
+        help="Sélectionnez le modèle à utiliser"
+    )
+else:
+    st.error("Aucun LLM cloud configuré. Configurez vos clés API dans les secrets Streamlit.")
+    st.stop()
 
 # Zone de saisie de question
 question = st.text_area(
