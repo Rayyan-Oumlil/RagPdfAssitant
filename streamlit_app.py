@@ -308,6 +308,17 @@ def initialize_rag():
             with open(st.session_state.chunks_path, "rb") as f:
                 st.session_state.doc_chunks = pickle.load(f)
         
+        # Load document info
+        if os.path.exists("data/documents_info.pkl"):
+            with open("data/documents_info.pkl", "rb") as f:
+                st.session_state.documents_info = pickle.load(f)
+        else:
+            st.session_state.documents_info = []
+        
+        # Sync uploaded_files with documents_info
+        if st.session_state.documents_info:
+            st.session_state.uploaded_files = [doc['name'] for doc in st.session_state.documents_info]
+        
         st.session_state.rag_initialized = True
 
 # Utility functions
@@ -369,6 +380,19 @@ def add_document_to_index(file):
     if not chunks:
         return False, "No textual content found"
     
+    # Store document info
+    doc_info = {
+        'name': file.name,
+        'chunks': chunks,
+        'start_index': len(st.session_state.doc_chunks),
+        'end_index': len(st.session_state.doc_chunks) + len(chunks)
+    }
+    
+    # Add to document tracking
+    if 'documents_info' not in st.session_state:
+        st.session_state.documents_info = []
+    st.session_state.documents_info.append(doc_info)
+    
     # Add chunks
     st.session_state.doc_chunks.extend(chunks)
     
@@ -381,7 +405,62 @@ def add_document_to_index(file):
     with open(st.session_state.chunks_path, "wb") as f:
         pickle.dump(st.session_state.doc_chunks, f)
     
+    # Save document info
+    with open("data/documents_info.pkl", "wb") as f:
+        pickle.dump(st.session_state.documents_info, f)
+    
     return True, f"Document added with {len(chunks)} chunks"
+
+def remove_document_from_index(doc_name):
+    """Removes a specific document from the index"""
+    if 'documents_info' not in st.session_state:
+        return False, "No documents to remove"
+    
+    # Find the document
+    doc_to_remove = None
+    for doc in st.session_state.documents_info:
+        if doc['name'] == doc_name:
+            doc_to_remove = doc
+            break
+    
+    if not doc_to_remove:
+        return False, "Document not found"
+    
+    # Remove from documents_info
+    st.session_state.documents_info.remove(doc_to_remove)
+    
+    # Remove from uploaded_files
+    if doc_name in st.session_state.uploaded_files:
+        st.session_state.uploaded_files.remove(doc_name)
+    
+    # Rebuild index without this document
+    rebuild_index_without_document(doc_to_remove)
+    
+    return True, f"Document {doc_name} removed successfully"
+
+def rebuild_index_without_document(doc_to_remove):
+    """Rebuilds the index excluding the specified document"""
+    # Clear current index
+    st.session_state.doc_chunks = []
+    st.session_state.index = faiss.IndexFlatL2(EMBEDDING_DIM)
+    
+    # Rebuild with remaining documents
+    for doc in st.session_state.documents_info:
+        chunks = doc['chunks']
+        st.session_state.doc_chunks.extend(chunks)
+        
+        # Create embeddings
+        embeddings = st.session_state.embed_model.encode(chunks)
+        st.session_state.index.add(np.array(embeddings))
+    
+    # Save rebuilt index
+    faiss.write_index(st.session_state.index, st.session_state.index_path)
+    with open(st.session_state.chunks_path, "wb") as f:
+        pickle.dump(st.session_state.doc_chunks, f)
+    
+    # Save updated document info
+    with open("data/documents_info.pkl", "wb") as f:
+        pickle.dump(st.session_state.documents_info, f)
 
 def ask_question(question: str, model: str) -> dict:
     """Asks a question to the RAG system"""
@@ -542,7 +621,7 @@ with st.sidebar:
     
     # Actions
     st.subheader("🔄 Actions")
-    if st.button("Reset Index", type="secondary"):
+    if st.button("Reset All", type="secondary", help="Remove all documents and reset index"):
         success, message = reset_index()
         if success:
             st.success(message)
@@ -574,14 +653,22 @@ with col1:
                     st.rerun()
                 else:
                     st.error(f"❌ Error: {message}")
-        else:
-            st.info(f"📋 {uploaded_file.name} already uploaded")
 
 with col2:
     st.subheader("📋 Documents")
     if st.session_state.uploaded_files:
-        for file in st.session_state.uploaded_files:
-            st.write(f"• {file}")
+        for i, file in enumerate(st.session_state.uploaded_files):
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                st.write(f"• {file}")
+            with col2:
+                if st.button("🗑️", key=f"remove_doc_{i}", help=f"Remove {file}"):
+                    success, message = remove_document_from_index(file)
+                    if success:
+                        st.success(f"✅ {file} removed!")
+                        st.rerun()
+                    else:
+                        st.error(f"❌ {message}")
     else:
         st.info("No documents")
 
